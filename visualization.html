@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Emigration Dashboard</title>
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="//d3js.org/topojson.v1.min.js"></script>
+    <style type="text/css">
+      body {
+        display: grid;
+        grid-template-columns: 700px 570px;
+        grid-template-rows: 500px 100px;
+        grid-gap: 50px;
+        background-color: white;
+        margin: auto;
+        padding: 3em;
+      }
+
+      #left-viz {
+        grid-column: 1 / span 1;
+        grid-row: 1 / span 1;
+        background-color: white;
+        overflow: hidden;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      }
+
+      #right-viz {
+        grid-column: 2 / span 1;
+        grid-row: 1 / span 1;
+        background-color: white;
+        overflow: hidden;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      }
+
+      #control-container {
+        grid-column: 1 / span 2;
+        grid-row: 2 / span 1;
+        background-color: white;
+        display: inline;
+      }
+
+      .chart-title {
+        text-anchor: middle;
+        font-family: "arial";
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .country-mouse-over-text,
+      .canton-mouse-over-text {
+        text-anchor: middle;
+        font-family: "arial";
+        font-size: 12px;
+        fill: #54494b;
+        pointer-events: none;
+      }
+
+      .title {
+        font-weight: bold;
+      }
+
+      .no-opacity {
+        opacity: 0;
+      }
+
+      .canton {
+        cursor: pointer;
+        stroke-width: 1.4px;
+        stroke: #54494b;
+      }
+
+      .country {
+        cursor: pointer;
+        stroke-width: 1px;
+        stroke: #54494b;
+      }
+
+      #country-mouse-over-box,
+      #canton-mouse-over-box {
+        pointer-events: none;
+      }
+
+      .legend-text {
+        font-family: "arial";
+        font-size: 10px;
+        font-weight: bold;
+        fill: #54494b;
+      }
+
+      .info {
+        padding: 6px 8px;
+        font: 14px/16px Arial, Helvetica, sans-serif;
+        background: white;
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+      }
+
+      .info h4 {
+        margin: 0 0 5px;
+        color: #777;
+      }
+
+      .info h1 {
+        font-size: 48px;
+        text-align: center;
+      }
+
+      .info p {
+        text-align: center;
+      }
+
+      .legend {
+        line-height: 18px;
+        color: #555;
+      }
+
+      .legend i {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-right: 8px;
+        opacity: 0.7;
+      }
+
+      .emigration-line {
+        stroke-linecap: round;
+        fill: none;
+        pointer-events: none;
+      }
+
+      /* Dropdown Button */
+      .dropbtn {
+        background-color: #54494b;
+        font-weight: bold;
+        color: #faf0e6;
+        padding: 10px;
+        font-family: "arial";
+        font-size: 12px;
+        border: none;
+        float: left;
+      }
+
+      /* The container <div> - needed to position the dropdown content */
+      .dropdown-age {
+        position: relative;
+        display: inline-block;
+        float: none;
+      }
+      /* Dropdown Content (Hidden by Default) */
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 144px;
+        z-index: 1;
+        max-height: 100px;
+        overflow: auto;
+        text-align: start;
+        cursor: pointer;
+        float: none;
+      }
+      .dropdown-content text {
+        color: #404e4d;
+        font-size: 10px;
+        font-family: "arial";
+        font-weight: bold;
+        padding: 4px 6px;
+        text-decoration: none;
+        display: block;
+      }
+      /* Change color of dropdown links on hover */
+      .dropdown-content text:hover {
+        background-color: #ddd;
+      }
+
+      /* Show the dropdown menu on hover */
+      .dropdown-age:hover .dropdown-content {
+        display: block;
+      }
+
+      /* Change the background color of the dropdown button when the dropdown content is shown */
+      .dropdown-age:hover .dropbtn {
+        background-color: #404e4d;
+      }
+
+      /* slider */
+      .step-button {
+        opacity: 0.8;
+        cursor: pointer;
+      }
+
+      .step-button:hover {
+        opacity: 1;
+      }
+
+      #control-container {
+        text-align: center;
+        margin: 10px;
+      }
+
+      #slide-container {
+        display: inline-block;
+        width: 500px;
+        height: 44px;
+        margin: 20px;
+      }
+
+      .slider {
+        -webkit-appearance: none;
+        display: inline-block;
+
+        width: 244px;
+        height: 6px;
+        border-radius: 2px;
+        background: #d3d3d3;
+        margin: 0 auto;
+        outline: none;
+        opacity: 0.8;
+        -webkit-transition: 0.2s;
+        transition: opacity 0.2s;
+      }
+
+      /* Mouse-over effects */
+      .slider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+      }
+
+      .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 8px;
+        height: 16px;
+        border-radius: 35%;
+        background: #54494b;
+        cursor: pointer;
+      }
+
+      .slider::-moz-range-thumb {
+        width: 8px;
+        height: 16px;
+        border-radius: 35%;
+        background: #54494b;
+        cursor: pointer;
+      }
+
+      .slider {
+        stroke: #d3d3d3;
+      }
+
+      .track-inset {
+        stroke: #d3d3d3;
+        stroke-width: 8px;
+      }
+
+      .track-overlay {
+        pointer-events: stroke;
+        stroke-width: 20px;
+        stroke: transparent;
+        cursor: pointer;
+      }
+
+      .handle {
+        fill: #54494b;
+        stroke: #000;
+        stroke-opacity: 0.5;
+        stroke-width: 0px;
+      }
+
+      .slider-labels {
+        text-anchor: middle;
+        font-family: "arial";
+        font-size: 12px;
+        font-weight: bold;
+        fill: #54494b;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="left-viz"></div>
+    <div id="right-viz"></div>
+    <div id="control-container">
+      <div class="dropdown-age">
+        <button class="dropbtn">SELECT AGE GROUP</button>
+        <div class="dropdown-content" id="age-group-selector"></div>
+      </div>
+      <div id="slide-container"></div>
+    </div>
+
+    <script type="text/javascript">
+      //Width and height
+      var rightWidth = 570,
+        rightHeight = 500,
+        leftWidth = 700,
+        leftHeight = 500,
+        maxCircleRadius = 20,
+        maxLineWidth = 10,
+        width = 500,
+        zoomVar = { k: 1, x: 0, y: 0 };
+
+      var filterObject = {
+        filterYear: "all",
+        filterAge: "all",
+        filterCountry: "all",
+        filterCanton: "all"
+      };
+
+      var rightProjection = d3
+        .geoAlbers()
+        .rotate([0, 0])
+        .center([8.2, 46.7])
+        .scale(8500)
+        .translate([rightWidth / 2, rightHeight / 2])
+        .precision(0.1);
+
+      var leftProjection = d3
+        .geoMercator()
+        .translate([leftWidth / 2, leftHeight / 2])
+        .center([0.2, 16.7])
+        .scale([110]);
+
+      var rightSVG = d3
+        .select("#right-viz")
+        .append("svg")
+        .attr("width", rightWidth)
+        .attr("height", rightHeight);
+
+      var leftSVG = d3
+        .select("#left-viz")
+        .append("svg")
+        .attr("width", leftWidth)
+        .attr("height", leftHeight);
+
+      var leftG = leftSVG.append("g");
+
+      var leftPath = d3.geoPath().projection(leftProjection);
+
+      var rightPath = d3.geoPath().projection(rightProjection);
+
+      const leftZoom = d3
+        .zoom()
+        .scaleExtent([1, 8])
+        .on("zoom", zoomed);
+
+      function zoomed() {
+        zoomVar = d3.event.transform;
+        console.log(zoomVar);
+        leftG
+          .selectAll("path") // To prevent stroke width from scaling
+          .attr("transform", d3.event.transform);
+
+        //leftG.selectAll("circle").attr("transform", d3.event.transform);
+      }
+
+      leftSVG.call(leftZoom);
+
+      var ageGroups = [
+        "all",
+        "work force (20-49)",
+        "golden agers (55-80)",
+        "0-4 years",
+        "5-9 years",
+        "10-14 years",
+        "15-19 years",
+        "20-24 years",
+        "25-29 years",
+        "30-34 years",
+        "35-39 years",
+        "40-44 years",
+        "45-49 years",
+        "50-54 years",
+        "55-59 years",
+        "60-64 years",
+        "65-69 years",
+        "70-74 years",
+        "75-79 years",
+        "80-84 years",
+        "85-89 years",
+        "90-94 years"
+      ];
+
+      var cantonNames = d3
+        .scaleOrdinal()
+        .domain([
+          "Glarus",
+          "Zug",
+          "Fribourg / Freiburg",
+          "Solothurn",
+          "Basel-Stadt",
+          "Basel-Landschaft",
+          "Schaffhausen",
+          "Appenzell Ausserrhoden",
+          "Appenzell Innerrhoden",
+          "St. Gallen",
+          "Graubünden / Grigioni / Grischun",
+          "Aargau",
+          "Thurgau",
+          "Ticino",
+          "Vaud",
+          "Valais / Wallis",
+          "Neuchâtel",
+          "Genève",
+          "Jura",
+          "Zürich",
+          "Bern / Berne",
+          "Luzern",
+          "Uri",
+          "Schwyz",
+          "Obwalden",
+          "Nidwalden"
+        ])
+        .range([
+          "Glarus",
+          "Zug",
+          "Fribourg",
+          "Solothurn",
+          "Basel-Stadt",
+          "Basel-Landschaft",
+          "Schaffhausen",
+          "Appenzell Ausserrhoden",
+          "Appenzell Innerrhoden",
+          "St. Gallen",
+          "Graubünden/Grigioni",
+          "Aargau",
+          "Thurgau",
+          "Ticino",
+          "Vaud",
+          "Valais/Wallis",
+          "Neuchâtel",
+          "Genève",
+          "Jura",
+          "Zürich",
+          "Bern/Berne",
+          "Luzern",
+          "Uri",
+          "Schwyz",
+          "Obwalden",
+          "Nidwalden"
+        ]);
+
+      dataToJSonCountry = [
+        "United States",
+        "Czechia",
+        "Serbia",
+        "Côte d'Ivoire",
+        "Guinea-Bissau",
+        "Congo (Brazzaville)",
+        "Congo (Kinshasa)",
+        "Eswatini",
+        "Tanzania",
+        "Taiwan (Chinese Taipei)"
+      ];
+      jsonToDataCountry = [
+        "United States of America",
+        "Czech Republic",
+        "Republic of Serbia",
+        "Ivory Coast",
+        "Guinea Bissau",
+        "Republic of the Congo",
+        "Democratic Republic of the Congo",
+        "Swaziland",
+        "United Republic of Tanzania",
+        "Taiwan"
+      ];
+
+      var countryNames = d3
+        .scaleOrdinal()
+        .domain(dataToJSonCountry)
+        .range(jsonToDataCountry);
+
+      d3.json("readme-swiss.json", function(swissJson) {
+        var cantonJSON = topojson.feature(swissJson, swissJson.objects.cantons);
+
+        d3.json("countries.geo.json", function(countriesJson) {
+          for (let j = 0; j < cantonJSON.features.length; j++) {
+            cantonJSON.features[j].properties.total = 0;
+          }
+
+          for (let j = 0; j < countriesJson.features.length; j++) {
+            countriesJson.features[j].properties.total = 0;
+          }
+
+          d3.csv("CH_Emigration_null.csv", function(data) {
+            data = data.filter(function(d) {
+              return d.Citizenship !== "Switzerland";
+            });
+
+            /* listOfCountriesInData = [];
+            data.forEach(function(d) {
+              if (listOfCountriesInData.indexOf(d.Citizenship) < 0) {
+                listOfCountriesInData.push(d.Citizenship);
+              }
+            });
+
+            listOfCountriesInJson = [];
+            countriesJson.features.forEach(function(d) {
+              if (listOfCountriesInJson.indexOf(d.properties.name) < 0) {
+                listOfCountriesInJson.push(d.properties.name);
+              }
+            });
+
+            listOfCountriesInJson.forEach(function(jsoncountry) {
+              if (listOfCountriesInData.indexOf(jsoncountry) < 0) {
+                console.log(jsoncountry);
+              }
+            });
+
+            console.log("-----");
+
+            listOfCountriesInData.forEach(function(datacountry) {
+              if (listOfCountriesInJson.indexOf(datacountry) < 0) {
+                console.log(datacountry);
+              }
+            }); */
+
+            var yearsObject = d3
+              .nest()
+              .key(function(d) {
+                return +d[
+                  "Emigration of the permanent resident population by canton- citizenship- sex and age class"
+                ];
+              })
+              .sortKeys()
+              .entries(data)
+              .sort(function(a, b) {
+                return d3.ascending(a, b);
+              });
+
+            var years = Array.from(yearsObject, function(d) {
+              return +d.key;
+            });
+
+            years.push("all");
+            years = years.sort().reverse();
+
+            data.forEach(function(d) {
+              d.all = d3.sum([
+                d["0-4 years"],
+                d["5-9 years"],
+                d["10-14 years"],
+                d["15-19 years"],
+                d["20-24 years"],
+                d["25-29 years"],
+                d["30-34 years"],
+                d["35-39 years"],
+                d["40-44 years"],
+                d["45-49 years"],
+                d["50-54 years"],
+                d["55-59 years"],
+                d["60-64 years"],
+                d["65-69 years"],
+                d["70-74 years"],
+                d["75-79 years"],
+                d["80-84 years"],
+                d["85-89 years"],
+                d["90-94 years"]
+              ]);
+
+              var dataCantonName = cantonNames(d.Canton);
+              if (dataToJSonCountry.indexOf(d.Citizenship) >= 0) {
+                var dataCountryName = countryNames(d.Citizenship);
+              } else {
+                var dataCountryName = d.Citizenship;
+              }
+
+              for (let j = 0; j < cantonJSON.features.length; j++) {
+                var cantonJsonName = cantonJSON.features[j].properties.name;
+                if (cantonJsonName === dataCantonName) {
+                  cantonJSON.features[j].properties.total += d.all;
+                }
+              }
+
+              for (let j = 0; j < countriesJson.features.length; j++) {
+                var countryJsonName = countriesJson.features[j].properties.name;
+                if (countryJsonName === dataCountryName) {
+                  countriesJson.features[j].properties.total += d.all;
+                }
+              }
+            });
+
+            var ageGroupSelector = d3
+              .select("#age-group-selector")
+              .selectAll("a")
+              .data(ageGroups)
+              .enter()
+              .append("text")
+              .text(function(d) {
+                return d;
+              })
+              .on("click", function(d, i) {
+                console.log("Age Group:", d);
+                filterObject.filterAge = d;
+                update_charts();
+              });
+
+            var currentValue = 0;
+            var targetValue = width;
+
+            var sliderSVG = d3
+              .select("#slide-container")
+              .append("svg")
+              .attr("width", width)
+              .attr("height", 44)
+              .append("g")
+              .attr("transform", "translate(" + width / 2 + "," + 17 + ")");
+
+            var sliderX = d3
+              .scaleLinear()
+              .domain([0, years.length - 1])
+              .range([-225, 225])
+              .clamp(true);
+
+            var sliderLabels = sliderSVG
+              .selectAll("slider-labels")
+              .data(years)
+              .enter()
+              .append("text")
+              .attr("x", function(d, i) {
+                return sliderX(i) + 2.5;
+              })
+              .attr("y", 25)
+              .attr("class", "slider-labels")
+              .text(function(d) {
+                if (typeof d === "string") {
+                  return d.toUpperCase();
+                } else {
+                  return d;
+                }
+              });
+
+            var slider = sliderSVG.append("g").attr("class", "slider");
+
+            slider
+              .append("line")
+              .attr("class", "track")
+              .attr("x1", sliderX.range()[0])
+              .attr("x2", sliderX.range()[1] + 4)
+              .select(function() {
+                return this.parentNode.appendChild(this.cloneNode(true));
+              })
+              .attr("class", "track-inset")
+              .select(function() {
+                return this.parentNode.appendChild(this.cloneNode(true));
+              })
+              .attr("class", "track-overlay")
+              .call(
+                d3
+                  .drag()
+                  .on("start.interrupt", function() {
+                    slider.interrupt();
+                  })
+                  .on("start drag", function() {
+                    currentValue = Math.round(sliderX.invert(d3.event.x));
+                    handle.attr("x", function() {
+                      return sliderX(currentValue) - 5;
+                    });
+                    console.log("Year:", years[currentValue]);
+                    filterObject.filterYear = years[currentValue] + "";
+                    update_charts();
+                  })
+              );
+
+            var handle = slider
+              .insert("rect", ".track-overlay")
+              .attr("class", "handle")
+              .attr("y", "-10")
+              .attr("x", sliderX(currentValue) - 5)
+              .attr("width", "16px")
+              .attr("height", "20px");
+
+            var leftCentroids = countriesJson.features.map(function(feature) {
+              return leftPath.centroid(feature);
+            });
+
+            // manual adjustments to country cccentroids:
+            leftCentroids[170] = [160.28813150973434, 200.53652705535595];
+            leftCentroids[28] = [133.39281332553415, 132.40027710817226];
+            leftCentroids[6] = [499.3566464049186, 484.20930510242];
+            leftCentroids[121] = [381.8299314691847, 98.47135868701795];
+
+            var maxCantonVal = d3.max(cantonJSON.features, function(d) {
+              return d.properties.total;
+            });
+            var minCantonVal = d3.min(cantonJSON.features, function(d) {
+              return d.properties.total;
+            });
+
+            var maxCountryVal = d3.max(countriesJson.features, function(d) {
+              return d.properties.total;
+            });
+            var minCountryVal = d3.min(countriesJson.features, function(d) {
+              return d.properties.total;
+            });
+
+            var count_country = d3
+              .nest()
+              .key(function(d) {
+                return d.Citizenship;
+              })
+              .rollup(function(v) {
+                return {
+                  total: d3.sum(v, function(d) {
+                    return d.all;
+                  })
+                };
+              })
+              .entries(data)
+              .sort(function(a, b) {
+                return d3.ascending(a.value.total, b.value.total);
+              });
+
+            var count_country_Json = d3
+              .nest()
+              .key(function(d) {
+                return d.properties.name;
+              })
+              .rollup(function(v) {
+                return {
+                  total: d3.sum(v, function(d) {
+                    return d.properties.total;
+                  })
+                };
+              })
+              .entries(countriesJson.features)
+              .sort(function(a, b) {
+                return d3.ascending(a.value.total, b.value.total);
+              });
+
+            var colorScale = d3
+              .scaleLinear()
+              .domain([minCantonVal, maxCantonVal])
+              .interpolate(d3.interpolateHcl)
+              .range(["#FEF1BC", "#A95568"]);
+
+            var countryColorScale = d3
+              .scaleLinear()
+              .domain([minCountryVal, maxCountryVal])
+              .interpolate(d3.interpolateHcl)
+              .range(["#FEF1BC", "#A95568"]);
+
+            /* var countryCircleRadiusScale = d3
+              .scaleLinear()
+              .domain([minCountryVal, maxCountryVal])
+              .range([0, maxCircleRadius]);
+
+            var lineScale = d3
+              .scaleLinear()
+              .domain([minCountryVal, maxCountryVal])
+              .range([0, maxLineWidth]); */
+
+            valDomain = [
+              minCantonVal,
+              minCantonVal + (maxCantonVal - minCantonVal) / 4,
+              minCantonVal + (maxCantonVal - minCantonVal) / 2,
+              minCantonVal + ((maxCantonVal - minCantonVal) * 3) / 4,
+              maxCantonVal
+            ];
+
+            var legend_text = valDomain.map(function(d) {
+              return d + "+";
+            });
+
+            var legend = rightSVG
+              .selectAll("g.legend")
+              .data(valDomain)
+              .enter()
+              .append("g")
+              .attr("class", "legend");
+
+            var ls_w = 20,
+              ls_h = 20;
+
+            legend
+              .append("rect")
+              .attr("x", 20)
+              .attr("y", function(d, i) {
+                return rightHeight - i * ls_h - 2 * ls_h;
+              })
+              .attr("width", ls_w)
+              .attr("height", ls_h)
+              .style("fill", function(d, i) {
+                return colorScale(d);
+              })
+              .style("opacity", 0.8);
+
+            var legendLabels = rightSVG
+              .selectAll("legend-text")
+              .data(valDomain)
+              .enter()
+              .append("text")
+              .attr("x", 47)
+              .attr("y", function(d, i) {
+                return rightHeight - i * ls_h - ls_h - 4;
+              })
+              .attr("dy", "-0.3em")
+              .classed("legend-text", true)
+              .text(function(d, i) {
+                return legend_text[i];
+              });
+
+            valCountryDomain = [
+              minCountryVal,
+              minCountryVal + (maxCountryVal - minCountryVal) / 4,
+              minCountryVal + (maxCountryVal - minCountryVal) / 2,
+              minCountryVal + ((maxCountryVal - minCountryVal) * 3) / 4,
+              maxCountryVal
+            ];
+
+            var legendCountrytext = valCountryDomain.map(function(d) {
+              return d + "+";
+            });
+
+            var countryLegend = leftG
+              .selectAll("g.legend")
+              .data(valCountryDomain)
+              .enter()
+              .append("g")
+              .attr("class", "legend");
+
+            countryLegend
+              .append("rect")
+              .attr("x", 20)
+              .attr("y", function(d, i) {
+                return leftHeight - i * ls_h - 2 * ls_h;
+              })
+              .attr("width", ls_w)
+              .attr("height", ls_h)
+              .style("fill", function(d, i) {
+                return countryColorScale(d);
+              })
+              .style("opacity", 0.8);
+
+            var countryLegendLabels = leftG
+              .selectAll("legend-text")
+              .data(valCountryDomain)
+              .enter()
+              .append("text")
+              .attr("x", 47)
+              .attr("y", function(d, i) {
+                return leftHeight - i * ls_h - ls_h - 4;
+              })
+              .attr("dy", "-0.3em")
+              .classed("legend-text", true)
+              .text(function(d, i) {
+                return legendCountrytext[i];
+              });
+
+            var countries = leftG
+              .selectAll(".country")
+              .data(countriesJson.features)
+              .enter()
+              .append("path")
+              .attr("d", leftPath)
+              .attr("opacity", 1)
+              .attr("class", "country")
+              .attr("id", function(d) {
+                return "country_" + d.properties.name.replace(/ /g, "-");
+              })
+              .attr("fill", function(d) {
+                return countryColorScale(d.properties.total);
+              })
+              .on("mouseover", countryMouseOver)
+              .on("mouseout", countryMouseOut)
+              .on("click", function(d, i) {
+                console.log("Country:", d.properties.name);
+                if (filterObject.filterCountry === d.properties.name) {
+                  filterObject.filterCountry = "all";
+                  update_charts();
+                } else {
+                  filterObject.filterCountry = d.properties.name;
+                  update_charts();
+                }
+              });
+
+            /* var countryCircles = leftG
+              .selectAll("circle")
+              .data(countriesJson.features)
+              .enter()
+              .append("circle")
+              .attr("cx", function(d, i) {
+                return leftCentroids[i][0];
+              })
+              .attr("cy", function(d, i) {
+                return leftCentroids[i][1];
+              })
+              .attr("r", function(d) {
+                return countryCircleRadiusScale(d.properties.total);
+              })
+              .attr("fill", function(d) {
+                return countryColorScale(d.properties.total);
+              });
+
+            var swissX = leftCentroids[29][0];
+            var swissY = leftCentroids[29][1];
+
+            var countryLines = leftG
+              .selectAll(".emigration-line")
+              .data(countriesJson.features)
+              .enter()
+              .append("path")
+              .attr("class", "emigration-line")
+              .attr("d", function(d, i) {
+                var startx = leftCentroids[i][0];
+                var starty = leftCentroids[i][1];
+                return (
+                  "M" +
+                  swissX +
+                  "," +
+                  swissY +
+                  " Q" +
+                  (startx + swissX) / 2 +
+                  " " +
+                  (starty + swissY) / 2.5 +
+                  " " +
+                  startx +
+                  " " +
+                  starty
+                );
+              })
+              .attr("stroke-width", function(d) {
+                return lineScale(d.properties.total);
+              })
+              .attr("stroke", function(d) {
+                return countryColorScale(d.properties.total);
+              }); */
+
+            var cantons = rightSVG
+              .selectAll(".canton")
+              .data(cantonJSON.features)
+              .enter()
+              .append("path")
+              .classed("canton", true)
+              .attr("d", rightPath)
+              .attr("fill", function(d) {
+                return colorScale(d.properties.total);
+              })
+              .attr("class", "canton")
+              .attr("id", function(d) {
+                return "canton_" + d.id;
+              })
+              .attr("opacity", 1)
+              .on("mouseover", cantonMouseOver)
+              .on("mouseout", cantonMouseOut)
+              .on("click", function(d, i) {
+                console.log("Canton:", d.properties.name);
+                if (filterObject.filterCanton === d.properties.name) {
+                  filterObject.filterCanton = "all";
+                  update_charts();
+                } else {
+                  filterObject.filterCanton = d.properties.name;
+                  update_charts();
+                }
+              });
+
+            function countryMouseOver(d, i) {
+              var selectedCountry = d.properties.name;
+
+              d3.select(this).style("stroke-width", 1.4);
+
+              countries.attr("opacity", function(d) {
+                if (d.properties.name === selectedCountry) {
+                  return 1;
+                } else {
+                  return 0.6;
+                }
+              });
+
+              var leftDummyToolText = leftSVG
+                .append("text")
+                .attr("id", "country-mouse-over-dummy-text")
+                .attr("class", "country-mouse-over-text no-opacity")
+                .attr("x", function() {
+                  return leftCentroids[i][0] * zoomVar.k + zoomVar.x;
+                })
+                .attr("y", function() {
+                  return leftCentroids[i][1] * zoomVar.k + zoomVar.y;
+                })
+                .html(function() {
+                  var x = d3.select(this).attr("x");
+                  var name = d.properties.name;
+                  var total = d.properties.total;
+                  line1 =
+                    "<tspan x=" +
+                    x +
+                    " class='country-mouse-over-text title no-opacity'>" +
+                    name +
+                    ":</tspan>";
+                  line2 =
+                    "<tspan x=" +
+                    x +
+                    " dy='1.1em' class='country-mouse-over-text no-opacity'>" +
+                    total +
+                    "</tspan>";
+                  return line1 + line2;
+                });
+
+              var leftToolBox = leftSVG
+                .append("rect")
+                .attr("id", "country-mouse-over-box")
+                .attr("x", function() {
+                  return (
+                    leftCentroids[i][0] * zoomVar.k +
+                    zoomVar.x -
+                    leftDummyToolText.node().getBoundingClientRect().width / 2 -
+                    5
+                  );
+                })
+                .attr("y", function() {
+                  return leftCentroids[i][1] * zoomVar.k + zoomVar.y - 17.5;
+                })
+                .attr("width", function() {
+                  return leftDummyToolText.node().getBBox().width + 10;
+                })
+                .attr("height", function() {
+                  return (
+                    leftDummyToolText.node().getBoundingClientRect().height + 10
+                  );
+                })
+                .style("fill", "#F3F4EF")
+                .style("opacity", 0.9);
+
+              var leftToolText = leftSVG
+                .append("text")
+                .attr("id", "country-mouse-over-text")
+                .attr("class", "country-mouse-over-text")
+                .attr("x", function() {
+                  return leftCentroids[i][0] * zoomVar.k + zoomVar.x;
+                })
+                .attr("y", function() {
+                  return leftCentroids[i][1] * zoomVar.k + zoomVar.y;
+                })
+                .html(function() {
+                  var x = d3.select(this).attr("x");
+                  var name = d.properties.name;
+                  var total = d.properties.total;
+                  line1 =
+                    "<tspan x=" +
+                    x +
+                    " class='country-mouse-over-text title'>" +
+                    name +
+                    ":</tspan>";
+                  line2 =
+                    "<tspan x=" +
+                    x +
+                    " dy='1.1em' class='country-mouse-over-text'>" +
+                    total +
+                    "</tspan>";
+                  return line1 + line2;
+                });
+            }
+
+            function update_data() {
+              var resultsData = data;
+              var resultsCountriesJson = countriesJson;
+              var resultsCantonsJson = { ...cantonJSON };
+
+              resultsCantonsJson.features.forEach(function(d) {
+                d.properties.total = 0;
+              });
+              resultsCountriesJson.features.forEach(function(d) {
+                d.properties.total = 0;
+              });
+              // function based on year (including all)
+              // function based on age group (including all)
+              // function based on country (including all)
+              // function based on canton (including all)
+              if (filterObject.filterYear !== "all") {
+                resultsData = resultsData.filter(function(d) {
+                  return (
+                    d[
+                      "Emigration of the permanent resident population by canton- citizenship- sex and age class"
+                    ] === filterObject.filterYear
+                  );
+                });
+              }
+
+              if (filterObject.filterCountry !== "all") {
+                resultsData = resultsData.filter(function(d) {
+                  if (dataToJSonCountry.indexOf(d.Citizenship) >= 0) {
+                    var countryName = countryNames(d.Citizenship);
+                  } else {
+                    var countryName = d.Citizenship;
+                  }
+                  return countryName === filterObject.filterCountry;
+                });
+              }
+              if (filterObject.filterCanton !== "all") {
+                resultsData = resultsData.filter(function(d) {
+                  return cantonNames(d.Canton) === filterObject.filterCanton;
+                });
+              }
+
+              resultsData.forEach(function(d) {
+                if (filterObject.filterAge === "all") {
+                  d.all = d3.sum([
+                    d["0-4 years"],
+                    d["5-9 years"],
+                    d["10-14 years"],
+                    d["15-19 years"],
+                    d["20-24 years"],
+                    d["25-29 years"],
+                    d["30-34 years"],
+                    d["35-39 years"],
+                    d["40-44 years"],
+                    d["45-49 years"],
+                    d["50-54 years"],
+                    d["55-59 years"],
+                    d["60-64 years"],
+                    d["65-69 years"],
+                    d["70-74 years"],
+                    d["75-79 years"],
+                    d["80-84 years"],
+                    d["85-89 years"],
+                    d["90-94 years"]
+                  ]);
+                }
+                if (filterObject.filterAge === "work force (20-49)") {
+                  d.all = d3.sum([
+                    d["20-24 years"],
+                    d["25-29 years"],
+                    d["30-34 years"],
+                    d["35-39 years"],
+                    d["40-44 years"],
+                    d["45-49 years"]
+                  ]);
+                }
+                if (filterObject.filterAge === "golden agers (55-80)") {
+                  d.all = d3.sum([
+                    d["55-59 years"],
+                    d["60-64 years"],
+                    d["65-69 years"],
+                    d["70-74 years"],
+                    d["75-79 years"]
+                  ]);
+                }
+                if (
+                  filterObject.filterAge !== "work force (20-49)" &&
+                  filterObject.filterAge !== "golden agers (55-80)" &&
+                  filterObject.filterAge !== "all"
+                ) {
+                  d.all = +d[filterObject.filterAge];
+                }
+
+                var dataCantonName = cantonNames(d.Canton);
+                var dataCountryName = d.Citizenship;
+
+                for (let j = 0; j < resultsCantonsJson.features.length; j++) {
+                  var cantonJsonName =
+                    resultsCantonsJson.features[j].properties.name;
+                  if (cantonJsonName === dataCantonName) {
+                    resultsCantonsJson.features[j].properties.total += d.all;
+                  }
+                }
+
+                for (let j = 0; j < resultsCountriesJson.features.length; j++) {
+                  var countryJsonName =
+                    resultsCountriesJson.features[j].properties.name;
+                  if (countryJsonName === dataCountryName) {
+                    resultsCountriesJson.features[j].properties.total += d.all;
+                  }
+                }
+              });
+
+              return [resultsData, resultsCountriesJson, resultsCantonsJson];
+            }
+
+            function update_charts() {
+              [
+                resultsData,
+                resultsCountriesJson,
+                resultsCantonsJson
+              ] = update_data();
+
+              var maxCantonVal = d3.max(resultsCantonsJson.features, function(
+                d
+              ) {
+                return d.properties.total;
+              });
+              var minCantonVal = d3.min(resultsCantonsJson.features, function(
+                d
+              ) {
+                return d.properties.total;
+              });
+
+              var maxCountryVal = d3.max(
+                resultsCountriesJson.features,
+                function(d) {
+                  return d.properties.total;
+                }
+              );
+              var minCountryVal = d3.min(
+                resultsCountriesJson.features,
+                function(d) {
+                  return d.properties.total;
+                }
+              );
+
+              valDomain = [
+                minCantonVal,
+                minCantonVal + (maxCantonVal - minCantonVal) / 4,
+                minCantonVal + (maxCantonVal - minCantonVal) / 2,
+                minCantonVal + ((maxCantonVal - minCantonVal) * 3) / 4,
+                maxCantonVal
+              ];
+
+              valCountryDomain = [
+                minCountryVal,
+                minCountryVal + (maxCountryVal - minCountryVal) / 4,
+                minCountryVal + (maxCountryVal - minCountryVal) / 2,
+                minCountryVal + ((maxCountryVal - minCountryVal) * 3) / 4,
+                maxCountryVal
+              ];
+
+              var legend_text = valDomain.map(function(d) {
+                return d + "+";
+              });
+
+              var legendCountrytext = valCountryDomain.map(function(d) {
+                return d + "+";
+              });
+
+              var cantonColorScale = d3
+                .scaleLinear()
+                .domain([minCantonVal, maxCantonVal])
+                .interpolate(d3.interpolateHcl)
+                .range(["#FEF1BC", "#A95568"]);
+
+              var cantons = rightSVG
+                .selectAll("path.canton")
+                .data(resultsCantonsJson.features);
+
+              cantons
+                .enter()
+                .merge(cantons)
+                .attr("fill", function(d) {
+                  return cantonColorScale(d.properties.total);
+                });
+
+              var legendLabels = rightSVG
+                .selectAll("text.legend-text")
+                .data(valDomain);
+
+              var countryLegendLabels = leftG
+                .selectAll("text.legend-text")
+                .data(valCountryDomain);
+
+              legendLabels
+                .enter()
+                .merge(legendLabels)
+                .text(function(d, i) {
+                  return legend_text[i];
+                });
+
+              countryLegendLabels
+                .enter()
+                .merge(countryLegendLabels)
+                .text(function(d, i) {
+                  return legendCountrytext[i];
+                });
+
+              var countryColorScale = d3
+                .scaleLinear()
+                .domain([minCountryVal, maxCountryVal])
+                .interpolate(d3.interpolateHcl)
+                .range(["#FEF1BC", "#A95568"]);
+
+              var countries = leftG
+                .selectAll("path.country")
+                .data(resultsCountriesJson.features);
+
+              countries
+                .enter()
+                .merge(countries)
+                .attr("fill", function(d) {
+                  return countryColorScale(d.properties.total);
+                });
+
+              /* var countryCircleRadiusScale = d3
+                .scaleLinear()
+                .domain([minCountryVal, maxCountryVal])
+                .range([0, maxCircleRadius]);
+
+              var lineScale = d3
+                .scaleLinear()
+                .domain([minCountryVal, maxCountryVal])
+                .range([0, maxLineWidth]); */
+
+              /* var countryCircles = leftSVG
+                .selectAll("circle")
+                .data(resultsCountriesJson.features);
+
+              countryCircles
+                .enter()
+                .merge(countryCircles)
+                .attr("r", function(d) {
+                  return countryCircleRadiusScale(d.properties.total);
+                })
+                .attr("fill", function(d) {
+                  return countryColorScale(d.properties.total);
+                }); */
+
+              /* var countryLines = leftSVG
+                .selectAll(".emigration-line")
+                .data(resultsCountriesJson.features);
+
+              countryLines
+                .enter()
+                .merge(countryLines)
+                .attr("d", function(d, i) {
+                  var startx = leftCentroids[i][0];
+                  var starty = leftCentroids[i][1];
+                  return (
+                    "M" +
+                    swissX +
+                    "," +
+                    swissY +
+                    " Q" +
+                    (startx + swissX) / 2 +
+                    " " +
+                    (starty + swissY) / 2.5 +
+                    " " +
+                    startx +
+                    " " +
+                    starty
+                  );
+                })
+                .attr("stroke-width", function(d) {
+                  return lineScale(d.properties.total);
+                })
+                .attr("stroke", function(d) {
+                  return countryColorScale(d.properties.total);
+                }); */
+            }
+
+            function countryMouseOut(d, i) {
+              d3.select(this).style("stroke-width", 1.4);
+              countries.attr("opacity", 1);
+              d3.select("#country-mouse-over-text").remove();
+              d3.select("#country-mouse-over-box").remove();
+              d3.select("#country-mouse-over-dummy-text").remove();
+            }
+
+            function cantonMouseOver(d, i) {
+              var selectedCanton = d.properties.name;
+              d3.select(this).style("stroke-width", 1);
+
+              cantons.attr("opacity", function(d) {
+                if (d.properties.name === selectedCanton) {
+                  return 1;
+                } else {
+                  return 0.6;
+                }
+              });
+
+              var dummyToolText = rightSVG
+                .append("text")
+                .attr("id", "canton-mouse-over-dummy-text")
+                .attr("class", "canton-mouse-over-text no-opacity")
+                .attr("x", function() {
+                  return (
+                    d3
+                      .select("#canton_" + d.id)
+                      .node()
+                      .getBBox().x +
+                    d3
+                      .select("#canton_" + d.id)
+                      .node()
+                      .getBBox().width /
+                      2
+                  );
+                })
+                .attr("y", function() {
+                  return (
+                    d3
+                      .select("#canton_" + d.id)
+                      .node()
+                      .getBBox().y +
+                    d3
+                      .select("#canton_" + d.id)
+                      .node()
+                      .getBBox().height /
+                      2
+                  );
+                })
+                .html(function() {
+                  var x = d3.select(this).attr("x");
+                  var name = d.properties.name;
+                  var total = d.properties.total;
+                  line1 =
+                    "<tspan x=" +
+                    x +
+                    " class='canton-mouse-over-text title'>" +
+                    name +
+                    ":</tspan>";
+                  line2 =
+                    "<tspan x=" +
+                    x +
+                    " dy='1.1em' class='canton-mouse-over-text'>" +
+                    total +
+                    "</tspan>";
+                  return line1 + line2;
+                });
+
+              var toolBox = rightSVG
+                .append("rect")
+                .attr("id", "canton-mouse-over-box")
+                .attr("x", function() {
+                  return dummyToolText.node().getBBox().x - 10;
+                })
+                .attr("y", function() {
+                  return dummyToolText.node().getBoundingClientRect().y - 52.5;
+                })
+                .attr("width", function() {
+                  return (
+                    dummyToolText.node().getBoundingClientRect().width + 20
+                  );
+                })
+                .attr("height", function() {
+                  return (
+                    dummyToolText.node().getBoundingClientRect().height + 10
+                  );
+                })
+                .style("fill", "#F3F4EF")
+                .style("opacity", 0.9);
+
+              var toolText = rightSVG
+                .append("text")
+                .attr("id", "canton-mouse-over-text")
+                .attr("class", "canton-mouse-over-text")
+                .attr("x", function() {
+                  return (
+                    d3
+                      .select("#canton_" + d.id)
+                      .node()
+                      .getBBox().x +
+                    d3
+                      .select("#canton_" + d.id)
+                      .node()
+                      .getBBox().width /
+                      2
+                  );
+                })
+                .attr("y", function() {
+                  return (
+                    d3
+                      .select("#canton_" + d.id)
+                      .node()
+                      .getBBox().y +
+                    d3
+                      .select("#canton_" + d.id)
+                      .node()
+                      .getBBox().height /
+                      2
+                  );
+                })
+                .html(function() {
+                  var x = d3.select(this).attr("x");
+                  var name = d.properties.name;
+                  var total = d.properties.total;
+                  line1 =
+                    "<tspan x=" +
+                    x +
+                    " class='canton-mouse-over-text title'>" +
+                    name +
+                    ":</tspan>";
+                  line2 =
+                    "<tspan x=" +
+                    x +
+                    " dy='1.1em' class='canton-mouse-over-text'>" +
+                    total +
+                    "</tspan>";
+                  return line1 + line2;
+                });
+            }
+
+            function cantonMouseOut(d, i) {
+              d3.select(this).style("stroke-width", 1.4);
+              cantons.attr("opacity", 1);
+              d3.select("#canton-mouse-over-text").remove();
+              d3.select("#canton-mouse-over-box").remove();
+              d3.select("#canton-mouse-over-dummy-text").remove();
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Schweizer Emigration</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+        <style>
+                body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif;}
+                body, html {
+                  height: 100%;
+                  color: #777;
+                  line-height: 1.8;
+                }
+                
+                /* Create a Parallax Effect */
+                .bgimg-1, .bgimg-2, .bgimg-3 {
+                  background-attachment: fixed;
+                  background-position: center;
+                  background-repeat: no-repeat;
+                  background-size: cover;
+                }
+                
+                /* First image (Logo. Full height) */
+                .bgimg-1 {
+                  background-image: url('man_trainstation.jpg');
+                  min-height: 100%;
+                }
+                
+                /* Second image (Portfolio) */
+                .bgimg-2 {
+                  background-image: url('airplane.jpg');
+                  min-height: 400px;
+                }
+
+                .bgimg-3{
+                    background-color: white;
+                }
+                
+
+                
+                .w3-wide {letter-spacing: 10px;}
+                .w3-hover-opacity {cursor: pointer;}
+                
+                /* Turn off parallax scrolling for tablets and phones */
+                @media only screen and (max-device-width: 1600px) {
+                  .bgimg-1, .bgimg-2, .bgimg-3 {
+                    background-attachment: scroll;
+                    min-height: 400px;
+                  }
+                }
+                </style>
+    
+    
+    
+    </head>
+    <body>
+
+<!-- NAVIGATION BAR -->
+        <div class="w3-top bgimg-3">
+            <div class="w3-bar" id="myNavbar">
+                    <a class="w3-bar-item w3-button w3-hover-black w3-hide-medium w3-hide-large w3-right" href="javascript:void(0);" onclick="toggleFunction()" title="Toggle Navigation Menu">
+                        <i class="fa fa-bars"></i>
+                    </a>
+
+                    <a href="#home" class="w3-bar-item w3-button">HOME</a>
+                    <a href="#info" class="w3-bar-item w3-button">Projekt Info</a>
+                    <a href="#data" class="w3-bar-item w3-button">Datenquelle</a>
+                    <a href="#viz" class="w3-bar-item w3-button">Visualisierung</a>
+                    <a href="#design" class="w3-bar-item w3-button">Designwahl</a>
+                    <a href="#ref" class="w3-bar-item w3-button">Referenzen</a>
+                    <a href="#team" class="w3-bar-item w3-button">Team</a>
+
+            </div>
+        </div>
+
+<!-- FIRST BG IMAGE / HOME SCREEN -->
+        <div class="bgimg-1 w3-display-containeer w3-opacity-min" id="home">
+            <div class="w3-display-middle" style="white-space:nowrap;">
+                    <span class="w3-center w3-padding-large w3-black w3-xlarge w3-wide w3-animate-opacity"><span class="w3-hide-small">Schweizer Emigration</span></span>
+            </div>
+        </div>
+
+<!-- SECTION PROJECT INFO   -->
+        <div class="w3-content w3-container w3-padding-64" id="info">
+            <h3 class="w4-center">Projekt Info</h3>
+            <h4 class="w4-center">Schweizer Emigration </h4>
+            <p>Das Thema Migration ist allgegenwärtig. Dabei geht jedoch vergessen, dass nicht nur Personen in die Schweiz einreisen, sondern die Anzahl der Auswanderer aus der Schweiz jährlich zunimmt. Die Visualisierung soll zeigen, wohin diese Menschen auswandern und ob die Zieldestination vom Alter der Emigranten abhängt. Es besteht die Annahme, dass Personen zwischen 55 und 79 Jahren (Golden-Agers) eher in südliche Länder auswandern, wo sie ihren Lebensabend in wärmeren Gegenden verbringen und Personen zwischen 20 und 49 Jahren (Workforce) Länder mit guten Arbeitschancen ins Auge fassen. <br/><br/>
+            Des Weiteren soll gezeigt werden, aus welchen Kantonen die Auswanderer der jeweiligen Zieldestination kommen.<br/>
+            Die Visualisierungsidee haben wir folgendermassen auf Papier gebracht:
+            </p>
+            <br>
+            <center><img src="Sketch_S1.jpg" alt="web-map sketch1" style="width:500px;height:707px;">
+            <img src="Sketch_S2.jpg" alt="web-map sketch2" style="width:1000px;height:700px;"></center>
+            
+        </div>
+
+<!-- SECOND BG IMAGE WITH Data TEXT -->
+
+        <div class="bgimg-2 w3-display-container w3-opacity-min">
+             <div class="w3-display-middle">
+                <span class="w3-xxlarge w3-text-white w3-wide"></span>
+            </div>
+        </div>
+
+
+<!-- SECTION DATA   -->
+        <div class="w3-content w3-container w3-padding-64" id="data">
+            <h3 class="w3-center">Datenquelle</h3>
+            <p>Die benutzten Daten stammen alle vom Bundesamt für Statistik, welches seine Daten öffentlich stellt. Die für diese Auswertung benötigten Datensätze lassen sich auf der Homepage des bfs herunterladen. Das Datenset ist etwa 5 MB gross und bseitzt 83'200 Einträge, welche in den Jahren 2011 bis 2018 aufgezeichnet wurden.
+            </p><br/>
+            <div>
+            <p>
+            <ul style="list-style-type:none" class="w3-col m6 w3-padding-large">
+            <li><a href="https://www.bfs.admin.ch/bfs/de/home/statistiken/bevoelkerung/migration-integration/internationale-wanderung.html">Internationale Wanderung</a></li>    
+            </ul></p>
+            </div>
+        </div>
+
+<!-- SECTION VISUALIZATION -->
+    
+        <div class="w3-content w3-container w3-padding-64" id="viz">
+            <h3 class="w3-center">Visualisierung</h3>
+            <p class="w3-center">Die Legende im linken Teil der Karten zeigt die Anzahl Auswanderer.</p>
+        </div>   
+        <div class="w3-content w3-container" style="max-width:1400px">
+            <iframe w3-strech src="visualization.html" style="border:none;width:1000%; height:800px"></iframe>
+        </div>
+
+<!-- SECTION DESIGN -->
+
+        <div class="w3-content w3-container w3-padding-64" id="design">
+            <h3 class="w3-center">Design</h3>
+            <p>Karten dienen seit Jahrtausenden als Repräsentationen räumlichen Wissens. Aufgrund ihrer herausragenden Fähigkeit zur Visualisierung von Geoinformationen gehörten sie allzeit zu den begehrtesten Artefakten der jeweils Herrschenden. Neben der Visualisierung von Geoinformationen dienten sie zur Kommunikation politischer und oftmals ideologischer Standpunkte im Zusammenhang mit dem Raumbezug.</p>
+            <p>Da Migration mit Geoinformationen visualisiert werden kann haben wir aus diesem Grund die Welt- und Schweizerkarte aus Basis unserer Visualisierung als geeignet errachtet. Durch die Karte kann angezeigt werden, aus welchen Schweizer Kantonen die Emigrierenden stammen und wohin diese auswandern.</p>
+            <p>Auf der Weltkarte lässt sich mit dem Mouseover-Effekt den Ländernamen sowie die Anzahl ins Land eingewanderten Personen anzeigen. Auf der auf der Schweizerkarte wid dadurch der Kantonsname und die Anzahl ausgewanderter Personen angezeigt. Durch den Mouseover-Effekt wirkt die Webseite lebendig und wichtige Informationen lassen sich so einfach und schnell anzeigen. Die Weltkarte kann durch Zoom vergrössert werden, so sind auch kleine Länder gut sichtbar.</p>
+            <p>Mit unterschiedlichen Farben werden auf der Welt- wie auch auf der Schweizerkarte die Anzahl ausgewanderter Personen dargestellt. Dies lässt ein Vergleich der einzelnen Kantonen und Länder zu. Der Farbraum gelb/orange wurde ausgewählt, da diese Farben auch von farbenblinden Menschen gesehen werden kann und ein guter Kontrast damit sichtbar ist.</p>
+            <p>Dadurch, dass die beiden Karten nebeneinander angesiedelt sind, lässt sich auf einen Blick erkennen, aus welchen Kantonen die Menschen in welche Länder ausgewandert sind. Die Daten lassen sich über alle Jahre oder auf einzelne Jahre heruntergebrochen anzeigen.</p>
+            <p>Um ein möglichst hohes Data-Ink Ratio zu erhalten, wurde die Visualsierung der Karten und des Sliders möglichst schlicht gehalten. In einem ersten Entwurf programmierten wir Pfeile, welche von der Schweiz ausgehen in die Länder projezierten, in welche ausgewandert wird. Die Dicke der Pfeile stellte dabei die Anzahl Emigranten dar. Da dies die Karte jedoch nur unübersichtlich macht, wurde schlussendlich darauf verzichtet.</p>
+            <p>Die Informationsvisualisierung ist ein Forschungsgebiet für sich. Auch wir mussten uns Gedanken machen, wie wir die abstrakten Daten sinnvoll darstellen. Die Visualisierung sollte nicht falsch wahrgenommen werden oder das Wesentliche verfälschen. Hinsichtlich unserer Datenvorlage gab es viele Möglichkeiten um die zeitlichen Veränderungen der Schweizer Emigration darzustellen. Meistens werden dafür Balken, Säulen oder Lininendiagramme verwendet. Diese Diagramme nutzen eine der beiden Achsen als zeitliche Abfolge des verwendeten zweidimensionalen Koordiantensystem. Vergleicht man aber nun mehrere Objekte, wie wir das in unserer Visualisierung machen, werden solche Diagramme meist unübersichtlich. Die Achsenverhältnisse müssen modifiziert dargestellt werden und die Übersicht des Gross-und-Ganzen geht verloren. Um die Intepretation der Gesammtheit zu untersützungen, sprich das „big-picuture“ zu fördern, erweist sich das geografische Koordinatensystem als die beste Visualisierungsart für unsere Daten. Mit dem Koordinatensystem lässt sich auch das Problem der fixen Zeitachse auslagern. Da jedoch ab hier die Visualisierung noch nicht endet, mussten weitere Ideen gesammelt werden, wie die Extraktion der numerischen Werte im Koordinaten System dargestellt werden. Es gibt viele Arten mit Bilder zu sprechen, unser finale Entschluss war die Wahl einer geeigneten Farbpalette. Somit unterstützt nun unsere Visualisierung eine effektive und effiziente Wahrnehmung mit dem Auge. </p>
+            <p>Schlussendlich soll noch etwas über die die Aufgaben der Visualisierungspipeline gesagt werden. Wir haben nun den Anfang und das Ende abgedeckt. Wir haben wir mit dem Computer Daten exportiert, aufbereitet und transformiert, so dass auf der menschlichen Seite eine einfachere Wahrnehmung und Kognition unserer Daten vollzogen werden kann. Die ersten Visualisierungen haben wir mit Tableau versucht, wir haben damit auch das Dataset mit Prep Builder erkundschaftet und dann in einem zweiten Schritt mit Javascript eine Liste generiert, die uns half, das Datenset in D3 zu visualisieren. </p>
+            <h4>Findings</h4>
+            <p>Wir fanden heraus, dass die Auswanderer aus der französischsprechenden Schweiz eher nach Frankreich, die deutschsprechenden nach Deutschland und die italienischsprechenden nach Italien auswandern. Zudem konnten wir feststellen, das es Golden Agers eher in wärmere Länder zieht als Personen, die noch voll im Arbeitsleben stehen und wahrscheinlich des Jobes wegen auswandern. Aus der Visualisation ist ersichtlich, dass die meisten Emigranten ins nahe Ausland, das heisst nach Europa auswandern. Destination auf anderen Kontinenten sind als Auswanderungsland weniger beliebt.</p>
+        </div>  
+<!-- SECTION DESIGN -->
+
+        <div class="w3-content w3-container w3-padding-64" id="ref">
+            <h3 class="w3-center">Referenzen</h3>
+            <p>
+            <ul style="list-style-type:none" class="w3-center w3-padding-large">
+	        <li><a href="https://github.com/datasets/geo-countries">Geometry</a></li>
+            <li><a href='https://bl.ocks.org/piwodlaiwo/c6e2478581d3932f99da781e9dade306'>Weltkarte</a></li>
+	        <li><a href="https://bl.ocks.org/johnwalley/4f850cc88313930ecda5b42affeefc32">Schweizer Karte</a></li>
+	        <li><a href="https://github.com/Kunalkatdare/Airline-routes">Migrationsrouten</a></li>
+            <li><a href='https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518'>Slider</a></li>
+	        <li><a href="https://w3schools.com">w3schools.com</a></li>
+	        </ul></p>
+            <p class="w3-center">Diese Webseite wurde mit html, css und javascript erstellt. Die Visualisierungen wurde mit D3.js erstellt.</p>
+        </div>  
+<!-- SECTION DESIGN -->
+
+        <div class="w3-content w3-container w3-padding-64" id="Team">
+            <h3 class="w3-center">Wer wir sind</h3>
+            <div class="w3-row">
+              <div class="w3-col s6 w3-center">
+                <p>Sophie Matter</p>
+                <p>Bsc. HSLU in Wirtschaftsinformatik</p>
+             </div>
+              <div class="w3-col s6 w3-center">
+                <p>Patrice  Weber</p>
+                <p>Bsc. HSLU in Wirtschaftsinformatik</p>
+             </div>
+            </div> 
+        </div>
+
+    </body>
+
+</html>
